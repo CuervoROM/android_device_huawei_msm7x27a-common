@@ -55,7 +55,7 @@ PRODUCT_PACKAGES += \
     libstagefrighthw
 
 PRODUCT_PACKAGES += \
-    gps.msm7x27a
+    gps.msm7x27a \
     camera.msm7x27a
 #    lights.msm7x27a
 
