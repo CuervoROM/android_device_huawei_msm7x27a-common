@@ -35,8 +35,11 @@ PRODUCT_PACKAGES += \
     libaudioutils
 
 PRODUCT_PACKAGES += \
+    libgenlock \
     copybit.msm7x27a \
     gralloc.msm7x27a \
+    libqdMetaData \
+    memtrack.msm7x27a \
     hwcomposer.msm7x27a \
     libtilerenderer
 
@@ -53,6 +56,7 @@ PRODUCT_PACKAGES += \
 
 PRODUCT_PACKAGES += \
     gps.msm7x27a
+    camera.msm7x27a
 #    lights.msm7x27a
 
 PRODUCT_PACKAGES += \
@@ -120,7 +124,10 @@ PRODUCT_PROPERTY_OVERRIDES += \
 PRODUCT_PROPERTY_OVERRIDES += \
     debug.composition.type=dyn \
     debug.hwc.dynThreshold=1.9 \
-    ro.bq.gpu_to_cpu_unsupported=1 \
+    persist.hwc.mdpcomp.enable=false \
+    debug.mdpcomp.logs=0 \
+    debug.gralloc.map_fb_memory=1 \
+    debug.hwc.fakevsync=1 \
     ro.max.fling_velocity=4000 \
     ro.opengles.version=131072 \
     ro.sf.lcd_density=240
