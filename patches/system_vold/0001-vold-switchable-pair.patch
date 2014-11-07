@@ -1,42 +1,19 @@
-From 8a4f1fb196fa5160485eb246035f1dd5691bd620 Mon Sep 17 00:00:00 2001
-From: Ricardo Cerqueira <cyanogenmod@cerqueira.org>
-Date: Fri, 19 Aug 2011 18:42:27 +0100
-Subject: [PATCH] vold: Allow pre-configured device pairs to switch mountpoints
+From 9a0e5292cf665834885df44d13a451016f77ac24 Mon Sep 17 00:00:00 2001
+From: luca020400 <luca.stefani.ge1@gmail.com>
+Date: Fri, 7 Nov 2014 18:23:24 +0100
+Subject: [PATCH 1/1] vold: Allow pre-configured device pairs to switch
+ mountpoints
 
-The use-case for this are devices with internal extended storage
-(pseudo-SDCard emmc) and an actual microSD card reader.
-In CM, we choose to use the microSD as primary storage, and leave
-the internal partition mostly unused; some users usually come up with
-imaginative and data-destroying ways of working around that.
-
-This allows us to specify a pair of mountpoints which can be
-switched from a user preference. For this vold.fstab:
-
------
-dev_mount sdcard /mnt/sdcard ...<path-to-microSD-sysfs>
-dev_mount emmc /mnt/emmc ...<path-to-emmc-partition>
------
-
-We can add to build.prop:
-"ro.vold.switchablepair=/mnt/sdcard,/mnt/emmc"
-
-A persistent toggle (persist.sys.vold.switchexternal), controllable
-through CMParts, can be presented to the user to allow choosing
-something other than our default as primary storage.
-
-Updated to 4.4 by @Dazzozo.
-
-Change-Id: I9559fa442c833e3168287d820b7b8347736abb15
 ---
  DirectVolume.cpp | 38 ++++++++++++++++++++++++++++++++++++++
  DirectVolume.h   |  4 ++--
  2 files changed, 40 insertions(+), 2 deletions(-)
 
 diff --git a/DirectVolume.cpp b/DirectVolume.cpp
-index 57dc555..b176d15 100644
+index 93ea6e9..2e43d03 100644
 --- a/DirectVolume.cpp
 +++ b/DirectVolume.cpp
-@@ -24,6 +24,7 @@
+@@ -25,6 +25,7 @@
  #define LOG_TAG "DirectVolume"
  
  #include <cutils/log.h>
@@ -44,7 +21,7 @@ index 57dc555..b176d15 100644
  #include <sysutils/NetlinkEvent.h>
  
  #include "DirectVolume.h"
-@@ -35,6 +36,7 @@
+@@ -72,6 +73,7 @@ bool PathInfo::match(const char *path)
  
  DirectVolume::DirectVolume(VolumeManager *vm, const fstab_rec* rec, int flags) :
          Volume(vm, rec, flags) {
@@ -52,11 +29,10 @@ index 57dc555..b176d15 100644
      mPaths = new PathCollection();
      for (int i = 0; i < MAX_PARTITIONS; i++)
          mPartMinors[i] = -1;
-@@ -62,6 +64,42 @@ DirectVolume::DirectVolume(VolumeManager *vm, const fstab_rec* rec, int flags) :
-     mMountpoint = strdup(mount);
+@@ -94,6 +96,42 @@ DirectVolume::DirectVolume(VolumeManager *vm, const fstab_rec* rec, int flags) :
      snprintf(mount, PATH_MAX, "%s/%s", Volume::FUSE_DIR, rec->label);
      mFuseMountpoint = strdup(mount);
-+
+ 
 +    property_get("persist.sys.vold.switchexternal", switchable, "0");
 +    if (!strcmp(switchable,"1")) {
 +        char *first, *second = NULL;
@@ -65,7 +41,7 @@ index 57dc555..b176d15 100644
 +        int lblidx = strlen(Volume::FUSE_DIR) + 1;
 +        bool swap = true;
 +
-+        property_get("ro.vold.switchablepair", switchable, "");
++        property_get("persist.sys.vold.switchablepair", switchable, "");
 +
 +        if (!(first = strtok(switchable, delim))) {
 +            SLOGE("Mount switch requested, but no switchable mountpoints found");
@@ -92,16 +68,17 @@ index 57dc555..b176d15 100644
 +            }
 +        }
 +    }
- #endif
- 
++
      setState(Volume::State_NoMedia);
+ }
+ 
 diff --git a/DirectVolume.h b/DirectVolume.h
-index 396ac91..8b6e9a8 100644
+index 421e1d9..7434dca 100644
 --- a/DirectVolume.h
 +++ b/DirectVolume.h
-@@ -31,8 +31,8 @@ class DirectVolume : public Volume {
+@@ -39,8 +39,8 @@ class DirectVolume : public Volume {
  public:
-     static const int MAX_PARTITIONS = VOLD_MAX_PARTITIONS;
+     static const int MAX_PARTITIONS = 32;
  protected:
 -    const char* mMountpoint;
 -    const char* mFuseMountpoint;
@@ -111,5 +88,4 @@ index 396ac91..8b6e9a8 100644
      PathCollection *mPaths;
      int            mDiskMajor;
 -- 
-1.8.1.2
-
+1.9.1
