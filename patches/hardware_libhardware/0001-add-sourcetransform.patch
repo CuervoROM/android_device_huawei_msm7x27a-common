@@ -1,34 +1,30 @@
-From 41735f87a8db22f2037a62658f01a6fdb069cc62 Mon Sep 17 00:00:00 2001
-From: "Arun Kumar K.R" <akumarkr@codeaurora.org>
-Date: Fri, 17 Aug 2012 11:23:21 -0700
+From dfb6c3375c595abe735d46b47c85aa9815e03c03 Mon Sep 17 00:00:00 2001
+From: luca020400 <luca.stefani.ge1@gmail.com>
+Date: Fri, 7 Nov 2014 18:15:26 +0100
 Subject: [PATCH] hwcomposer: Add sourceTransform to hwc_layer_t
 
 sourceTransform has the source buffer transform which can used to
 apply rotation on displays whose orientation is fixed(HDMI).
-
-CRs-fixed: 387357
-Change-Id: I26eb2de76b3548634a80ca8b98547c6fdfe145ea
-(cherry picked from commit f16aed381eb2a7232bf576c1d77cdad61be54419)
 ---
- include/hardware/hwcomposer_v0.h | 5 +++++
+ include/hardware/hwcomposer.h | 5 +++++
  1 file changed, 5 insertions(+)
 
-diff --git a/include/hardware/hwcomposer_v0.h b/include/hardware/hwcomposer_v0.h
-index 473819b..6e9308d 100644
---- a/include/hardware/hwcomposer_v0.h
-+++ b/include/hardware/hwcomposer_v0.h
-@@ -97,6 +97,11 @@ typedef struct hwc_layer {
-              * not changed. */
-             buffer_handle_t handle;
- 
+diff --git a/include/hardware/hwcomposer.h b/include/hardware/hwcomposer.h
+index 4818d0b..6776675 100644
+--- a/include/hardware/hwcomposer.h
++++ b/include/hardware/hwcomposer.h
+@@ -183,6 +183,11 @@ typedef struct hwc_layer_1 {
+                  * of the sideband video stream to compose. */
+                 const native_handle_t* sidebandStream;
+             };
++            
 +#ifdef QCOM_HARDWARE
 +            /* source transform of the buffer */
 +            uint32_t sourceTransform;
 +#endif
-+
+ 
              /* transformation to apply to the buffer during composition */
              uint32_t transform;
- 
 -- 
-1.8.4
+1.9.1
 
