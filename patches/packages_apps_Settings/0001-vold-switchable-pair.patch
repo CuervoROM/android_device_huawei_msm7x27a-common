@@ -1,41 +1,23 @@
-From d95a76e3556eaf5eabdfd43f9f0230373e188f18 Mon Sep 17 00:00:00 2001
-From: dhacker29 <davidhackerdvm@gmail.com>
-Date: Sat, 17 Aug 2013 16:35:18 -0500
-Subject: [PATCH] Add setting for Vold Switchable Pair (2/2)
+From d4664266551a184c537a2d53758de3c2877f62c3 Mon Sep 17 00:00:00 2001
+From: luca020400 <luca.stefani.ge1@gmail.com>
+Date: Fri, 7 Nov 2014 18:28:29 +0100
+Subject: [PATCH 12/12] Add setting for Vold Switchable Pair
 
-This will be hidden unless the device has non-emulated internal storage
-and an external SD, in which case persist.sys.vold.switchablepair will be
-set automaticaly.  This does away with the need for ro.vold.switchablepair
-to be set in the build.prop.
-
-Change-Id: Id83fc90d771ca3a7179f2c50d0ae828eb3dbaa9f
 ---
- AndroidManifest.xml                             |  1 +
- res/values/cm_strings.xml                       |  7 ++++
+ res/values/strings.xml                          |  8 ++++
  res/xml/device_info_memory.xml                  |  5 +++
- src/com/android/settings/deviceinfo/Memory.java | 54 ++++++++++++++++++++++++-
- 4 files changed, 66 insertions(+), 1 deletion(-)
+ src/com/android/settings/deviceinfo/Memory.java | 53 ++++++++++++++++++++++++-
+ 3 files changed, 65 insertions(+), 1 deletion(-)
 
-diff --git a/AndroidManifest.xml b/AndroidManifest.xml
-index 5825e8e..5993e07 100644
---- a/AndroidManifest.xml
-+++ b/AndroidManifest.xml
-@@ -72,6 +72,7 @@
-     <uses-permission android:name="android.permission.CHANGE_PRIVACY_GUARD_STATE" />
-     <uses-permission android:name="android.permission.READ_PHONE_BLACKLIST" />
-     <uses-permission android:name="android.permission.CHANGE_PHONE_BLACKLIST" />
-+    <uses-permission android:name="android.permission.REBOOT" />
- 
-     <permission
-         android:name="android.permission.REQUEST_SUPERUSER"
-diff --git a/res/values/cm_strings.xml b/res/values/cm_strings.xml
-index ed81926..6667e5a 100644
---- a/res/values/cm_strings.xml
-+++ b/res/values/cm_strings.xml
-@@ -700,6 +700,13 @@ two in order to insert additional control points. \'Remove\' deletes the selecte
-     <string name="adb_notify">USB debugging notify</string>
-     <string name="adb_notify_summary">Display a notification when USB debugging is connected</string>
- 
+diff --git a/res/values/strings.xml b/res/values/strings.xml
+index e6edcd5..7d019e0 100644
+--- a/res/values/strings.xml
++++ b/res/values/strings.xml
+@@ -6098,4 +6098,12 @@
+     <string name="usb_sdcard_title">Mount SD card</string>
+     <string name="external_storage_turn_on">External storage has been turned on</string>
+     <string name="external_storage_turn_off">External storage has been turned off</string>
++
 +    <!-- Vold Switchable Pair -->
 +    <string name="storage_switch_title">Use external SD as primary</string>
 +    <string name="storage_switch_summary_off">Using expanded internal storage for apps and media</string>
@@ -43,17 +25,15 @@ index ed81926..6667e5a 100644
 +    <string name="reboot_prompt_title">Reboot required</string>
 +    <string name="reboot_prompt_message">In order to apply the changed configuration, a reboot is required.\n\nDo you want to reboot now?</string>
 +
-     <!-- Android debugging over WiFi -->
-     <string name="adb_over_network">ADB over network</string>
-     <string name="adb_over_network_summary">Enable TCP/IP debugging over network interfaces (Wi-Fi, USB networks). This setting is reset on reboot</string>
+ </resources>
 diff --git a/res/xml/device_info_memory.xml b/res/xml/device_info_memory.xml
-index e905f39..2010b2c 100644
+index 38cc94a..3b2f80e 100644
 --- a/res/xml/device_info_memory.xml
 +++ b/res/xml/device_info_memory.xml
-@@ -16,6 +16,11 @@
- 
- <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
-         android:title="@string/storage_settings_title">
+@@ -18,6 +18,11 @@
+                   xmlns:settings="http://schemas.android.com/apk/res/com.android.settings"
+         android:title="@string/storage_settings"
+         settings:keywords="@string/keywords_storage">
 +    <CheckBoxPreference
 +        android:key="key_switch_storage"
 +        android:title="@string/storage_switch_title"
@@ -63,7 +43,7 @@ index e905f39..2010b2c 100644
  <!-- Preference categories are dynamically created based on the list of available storage volumes -->
  
 diff --git a/src/com/android/settings/deviceinfo/Memory.java b/src/com/android/settings/deviceinfo/Memory.java
-index 52fef32..5b79865 100644
+index 8636560..deeb06f 100644
 --- a/src/com/android/settings/deviceinfo/Memory.java
 +++ b/src/com/android/settings/deviceinfo/Memory.java
 @@ -32,16 +32,20 @@ import android.hardware.usb.UsbManager;
@@ -80,14 +60,14 @@ index 52fef32..5b79865 100644
  import android.os.storage.StorageManager;
  import android.os.storage.StorageVolume;
 +import android.preference.CheckBoxPreference;
+ import android.os.SystemProperties;
  import android.preference.Preference;
- import android.preference.PreferenceActivity;
  import android.preference.PreferenceScreen;
 +import android.text.TextUtils;
  import android.util.Log;
  import android.view.Menu;
  import android.view.MenuInflater;
-@@ -80,6 +84,10 @@ public class Memory extends SettingsPreferenceFragment {
+@@ -86,6 +90,10 @@ public class Memory extends SettingsPreferenceFragment implements Indexable {
      private UsbManager mUsbManager;
  
      private ArrayList<StorageVolumePreferenceCategory> mCategories = Lists.newArrayList();
@@ -98,7 +78,7 @@ index 52fef32..5b79865 100644
  
      @Override
      public void onCreate(Bundle icicle) {
-@@ -94,6 +102,27 @@ public class Memory extends SettingsPreferenceFragment {
+@@ -100,6 +108,27 @@ public class Memory extends SettingsPreferenceFragment implements Indexable {
  
          addPreferencesFromResource(R.xml.device_info_memory);
  
@@ -126,7 +106,7 @@ index 52fef32..5b79865 100644
          addCategory(StorageVolumePreferenceCategory.buildForInternal(context));
  
          final StorageVolume[] storageVolumes = mStorageManager.getVolumeList();
-@@ -213,7 +242,13 @@ public class Memory extends SettingsPreferenceFragment {
+@@ -241,7 +270,13 @@ public class Memory extends SettingsPreferenceFragment implements Indexable {
  
      @Override
      public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen, Preference preference) {
@@ -141,11 +121,10 @@ index 52fef32..5b79865 100644
              ConfirmClearCacheFragment.show(this);
              return true;
          }
-@@ -423,4 +458,21 @@ public class Memory extends SettingsPreferenceFragment {
-             return builder.create();
-         }
-     }
-+
+@@ -559,4 +594,20 @@ public class Memory extends SettingsPreferenceFragment implements Indexable {
+             }
+         };
+ 
 +    private void showRebootPrompt() {
 +        AlertDialog dialog = new AlertDialog.Builder(getActivity())
 +                .setTitle(R.string.reboot_prompt_title)
@@ -164,5 +143,4 @@ index 52fef32..5b79865 100644
 +    }
  }
 -- 
-1.8.1.2
-
+1.9.1
