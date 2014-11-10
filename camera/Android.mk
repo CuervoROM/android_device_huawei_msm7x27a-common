@@ -43,9 +43,9 @@ endif
 LOCAL_C_INCLUDES += $(TARGET_OUT_INTERMEDIATES)/KERNEL_OBJ/usr/include
 LOCAL_ADDITIONAL_DEPENDENCIES := $(TARGET_OUT_INTERMEDIATES)/KERNEL_OBJ/usr
 LOCAL_C_INCLUDES += \
-     hardware/qcom/display-$(TARGET_QCOM_DISPLAY_VARIANT)/libgralloc \
-     hardware/qcom/media-$(TARGET_QCOM_MEDIA_VARIANT)/libstagefrighthw \
-     hardware/qcom/media-$(TARGET_QCOM_MEDIA_VARIANT)/mm-core/inc \
+     hardware/qcom/display-caf/libgralloc \
+     hardware/qcom/media/libstagefrighthw \
+     hardware/qcom/media/mm-core/inc \
      frameworks/base/services/camera/libcameraservice \
      frameworks/native/include/media/hardware \
      $(LOCAL_PATH)/mm-camera-interface
