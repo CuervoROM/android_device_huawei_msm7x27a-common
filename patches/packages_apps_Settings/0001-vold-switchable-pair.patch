@@ -1,23 +1,23 @@
-From d4664266551a184c537a2d53758de3c2877f62c3 Mon Sep 17 00:00:00 2001
+From 37d32f299909e795053e33563b4d31207137d672 Mon Sep 17 00:00:00 2001
 From: luca020400 <luca.stefani.ge1@gmail.com>
-Date: Fri, 7 Nov 2014 18:28:29 +0100
-Subject: [PATCH 12/12] Add setting for Vold Switchable Pair
+Date: Sat, 15 Nov 2014 11:05:43 +0100
+Subject: [PATCH 1/1] Add setting for Vold Switchable Pair ( For lollipop )
+ (2/2)
 
 ---
- res/values/strings.xml                          |  8 ++++
+ res/values/cm_strings.xml                       |  7 ++++
  res/xml/device_info_memory.xml                  |  5 +++
- src/com/android/settings/deviceinfo/Memory.java | 53 ++++++++++++++++++++++++-
+ src/com/android/settings/deviceinfo/Memory.java | 54 ++++++++++++++++++++++++-
  3 files changed, 65 insertions(+), 1 deletion(-)
 
-diff --git a/res/values/strings.xml b/res/values/strings.xml
-index e6edcd5..7d019e0 100644
---- a/res/values/strings.xml
-+++ b/res/values/strings.xml
-@@ -6098,4 +6098,12 @@
-     <string name="usb_sdcard_title">Mount SD card</string>
-     <string name="external_storage_turn_on">External storage has been turned on</string>
-     <string name="external_storage_turn_off">External storage has been turned off</string>
-+
+diff --git a/res/values/cm_strings.xml b/res/values/cm_strings.xml
+index 9118db4..e921e76 100644
+--- a/res/values/cm_strings.xml
++++ b/res/values/cm_strings.xml
+@@ -34,6 +34,13 @@
+     <string name="root_access_adb">ADB only</string>
+     <string name="root_access_all">Apps and ADB</string>
+ 
 +    <!-- Vold Switchable Pair -->
 +    <string name="storage_switch_title">Use external SD as primary</string>
 +    <string name="storage_switch_summary_off">Using expanded internal storage for apps and media</string>
@@ -25,7 +25,9 @@ index e6edcd5..7d019e0 100644
 +    <string name="reboot_prompt_title">Reboot required</string>
 +    <string name="reboot_prompt_message">In order to apply the changed configuration, a reboot is required.\n\nDo you want to reboot now?</string>
 +
- </resources>
+     <!-- Sound settings screen -->
+     <string name="ring_mode_title">Ring mode</string>
+     <string name="ring_mode_normal">Normal</string>
 diff --git a/res/xml/device_info_memory.xml b/res/xml/device_info_memory.xml
 index 38cc94a..3b2f80e 100644
 --- a/res/xml/device_info_memory.xml
@@ -43,7 +45,7 @@ index 38cc94a..3b2f80e 100644
  <!-- Preference categories are dynamically created based on the list of available storage volumes -->
  
 diff --git a/src/com/android/settings/deviceinfo/Memory.java b/src/com/android/settings/deviceinfo/Memory.java
-index 8636560..deeb06f 100644
+index 8636560..c698b42 100644
 --- a/src/com/android/settings/deviceinfo/Memory.java
 +++ b/src/com/android/settings/deviceinfo/Memory.java
 @@ -32,16 +32,20 @@ import android.hardware.usb.UsbManager;
@@ -121,9 +123,9 @@ index 8636560..deeb06f 100644
              ConfirmClearCacheFragment.show(this);
              return true;
          }
-@@ -559,4 +594,20 @@ public class Memory extends SettingsPreferenceFragment implements Indexable {
-             }
-         };
+@@ -486,6 +521,23 @@ public class Memory extends SettingsPreferenceFragment implements Indexable {
+         }
+     }
  
 +    private void showRebootPrompt() {
 +        AlertDialog dialog = new AlertDialog.Builder(getActivity())
@@ -141,6 +143,9 @@ index 8636560..deeb06f 100644
 +
 +        dialog.show();
 +    }
- }
++
+     /**
+      * Enable indexing of searchable data
+      */
 -- 
 1.9.1
