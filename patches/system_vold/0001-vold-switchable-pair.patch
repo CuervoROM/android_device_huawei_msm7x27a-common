@@ -1,8 +1,7 @@
-From 9a0e5292cf665834885df44d13a451016f77ac24 Mon Sep 17 00:00:00 2001
+From 1c8bf48406bd7950132d8940e073570524b5e452 Mon Sep 17 00:00:00 2001
 From: luca020400 <luca.stefani.ge1@gmail.com>
-Date: Fri, 7 Nov 2014 18:23:24 +0100
-Subject: [PATCH 1/1] vold: Allow pre-configured device pairs to switch
- mountpoints
+Date: Sat, 15 Nov 2014 11:19:45 +0100
+Subject: [PATCH 1/1] Allow pre-configured device pairs to switch
 
 ---
  DirectVolume.cpp | 38 ++++++++++++++++++++++++++++++++++++++
@@ -10,7 +9,7 @@ Subject: [PATCH 1/1] vold: Allow pre-configured device pairs to switch
  2 files changed, 40 insertions(+), 2 deletions(-)
 
 diff --git a/DirectVolume.cpp b/DirectVolume.cpp
-index 93ea6e9..2e43d03 100644
+index a869460..8c69bc9 100644
 --- a/DirectVolume.cpp
 +++ b/DirectVolume.cpp
 @@ -25,6 +25,7 @@
@@ -29,9 +28,9 @@ index 93ea6e9..2e43d03 100644
      mPaths = new PathCollection();
      for (int i = 0; i < MAX_PARTITIONS; i++)
          mPartMinors[i] = -1;
-@@ -94,6 +96,42 @@ DirectVolume::DirectVolume(VolumeManager *vm, const fstab_rec* rec, int flags) :
-     snprintf(mount, PATH_MAX, "%s/%s", Volume::FUSE_DIR, rec->label);
+@@ -100,6 +102,42 @@ DirectVolume::DirectVolume(VolumeManager *vm, const fstab_rec* rec, int flags) :
      mFuseMountpoint = strdup(mount);
+ #endif
  
 +    property_get("persist.sys.vold.switchexternal", switchable, "0");
 +    if (!strcmp(switchable,"1")) {
@@ -73,12 +72,12 @@ index 93ea6e9..2e43d03 100644
  }
  
 diff --git a/DirectVolume.h b/DirectVolume.h
-index 421e1d9..7434dca 100644
+index 7ab06c0..5ff575b 100644
 --- a/DirectVolume.h
 +++ b/DirectVolume.h
-@@ -39,8 +39,8 @@ class DirectVolume : public Volume {
+@@ -43,8 +43,8 @@ class DirectVolume : public Volume {
  public:
-     static const int MAX_PARTITIONS = 32;
+     static const int MAX_PARTITIONS = VOLD_MAX_PARTITIONS;
  protected:
 -    const char* mMountpoint;
 -    const char* mFuseMountpoint;
